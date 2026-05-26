@@ -1,0 +1,16 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# 文档
+*.md
+
+# 不需要的文件
+pwn_entry.py
+setup.sh
+setup.bat

@@ -1,0 +1,3 @@
+# 禁止直接访问 assets 目录下的所有文件
+# PHP 通过 file_get_contents() 读取不受此限制
+Deny from all

@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  ctf-mysql:
+    image: mysql:8.0
+    container_name: ctf-mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: ctf_sqli
+      MYSQL_USER: ctf_user
+      MYSQL_PASSWORD: ctf_password
+    volumes:
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  ctf-platform:
+    # 如果使用预构建镜像，注释掉 build，取消注释 image
+    build:
+      context: .
+      args:
+        DEBIAN_MIRROR: ${DEBIAN_MIRROR}
+    image: ${DOCKER_REGISTRY:-hiveyarnzinc/}ctf-platform:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./flags_data:/var/www/html/flags
+    # 以root运行确保对挂载卷有写入权限
+    user: root
+    depends_on:
+      ctf-mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  ctf-progress:
+    # 如果使用预构建镜像，注释掉 build，取消注释 image
+    build: ./progress_service
+    image: ${DOCKER_REGISTRY:-hiveyarnzinc/}ctf-progress:latest
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./progress_data:/data
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

@@ -1,0 +1,7 @@
+# 进度数据（Docker 卷挂载目录，服务运行时自动生成）
+progress_data/
+
+# 预构建镜像文件（通过 import-images.sh 导入）
+images/*.tar
+images/*.tar.gz
+!images/.gitkeep
